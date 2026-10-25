@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jamb Prep App</title>
+<meta name="theme-color" content="#0B1230">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#F5F7FF;--card:#fff;--text:#141A3A;--muted:#7B83A6;--pri:#4F6BFF;--bd:#E3E8FF;--navy:#0B1230;--navy2:#1B2A7A;--ok:#22C55E;--bad:#EF4444;--bub:#DCE4FF;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1230;--card:#141C4A;--text:#EEF1FF;--muted:#9AA3D0;--bd:#2A3670;--bub:#27358A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1230;--card:#141C4A;--text:#EEF1FF;--muted:#9AA3D0;--bd:#2A3670;--bub:#27358A;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+svg{display:block;flex:none}
+#app{height:100%;display:flex;flex-direction:column}
+#view{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;border-top:1px solid var(--bd);background:var(--card)}
+.tabs button{flex:1;background:none;border:0;padding:8px 0;color:var(--muted);font:600 11px system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs button.on{color:var(--pri)}
+.row{display:flex;align-items:center;gap:12px}.between{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:22px}h2{font-size:17px}.muted{color:var(--muted);font-size:13px}.tiny{color:var(--muted);font-size:11px}
+.av{width:44px;height:44px;border-radius:50%;background:var(--pri);display:grid;place-items:center;color:#fff;flex:none}
+.ai{background:linear-gradient(135deg,#4F6BFF,#8B5CF6);font-weight:800}
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:22px;padding:20px}
+.hero h2{font-size:22px;line-height:1.3}.hero p{color:#C9D2FF;font-size:13px;margin:6px 0 14px}
+.btn{border:0;color:#fff;font:700 14px system-ui,sans-serif;padding:12px 22px;border-radius:18px;background:linear-gradient(90deg,#4F6BFF,#8B5CF6);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:0;text-align:left;border-radius:18px;padding:14px;min-height:112px;color:var(--text);font-family:inherit}
+.tile b{display:block;font-size:14px}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:8px}
+.card{background:var(--card);border-radius:16px;padding:14px}
+.bar{height:7px;border-radius:4px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;border-radius:4px;background:var(--pri)}
+.res{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.res button{border:0;background:var(--card);color:var(--text);border-radius:14px;padding:10px 4px;font:600 11px system-ui,sans-serif}
+.res .ic{margin:0 auto 6px}
+.topic{display:flex;align-items:center;gap:12px}.topic .ic{margin:0}.topic b{display:block;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{border-radius:16px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}.stat strong{display:block;font-size:24px}
+.chat{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.b{max-width:85%;padding:12px 14px;border-radius:18px;font-size:14px;line-height:1.45}
+.b.me{align-self:flex-end;background:var(--bub)}.b.bot{align-self:flex-start;background:var(--card)}
+.inp{display:flex;gap:10px}.inp input{flex:1;border:1px solid var(--bd);background:var(--card);color:var(--text);border-radius:24px;padding:12px 16px;font-size:15px}
+.inp button{width:44px;height:44px;border:0;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center}
+.ov{position:fixed;inset:0;z-index:9;display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.quiz{background:var(--navy);color:#fff;gap:14px}
+.qc{background:#141C4A;border-radius:18px;padding:18px}.chip{display:inline-block;background:#3B4FD8;border-radius:10px;padding:4px 10px;font-size:11px;font-weight:600}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;border:1.5px solid #2A3670;background:#0F1740;color:#fff;font-size:15px}
+.opt i{width:32px;height:32px;border-radius:50%;background:#232F6B;display:grid;place-items:center;font-style:normal;font-weight:700;flex:none}
+.opt.ok{border-color:var(--ok)}.opt.ok i{background:var(--ok)}.opt.no{border-color:var(--bad)}.opt.no i{background:var(--bad)}
+.tour{background:rgba(11,18,48,.7);justify-content:flex-end}
+.tc{background:var(--card);border-radius:24px;padding:20px;margin-bottom:60px}
+.dots{display:flex;gap:6px;margin:14px 0}.dots i{height:8px;width:8px;border-radius:4px;background:var(--bd)}.dots i.on{width:22px;background:var(--pri)}
+.chips{display:flex;gap:8px;overflow-x:auto;flex:none;padding-bottom:4px}
+.chip2{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--text);border-radius:18px;padding:8px 14px;font:600 13px system-ui,sans-serif}
+.chip2.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.wel{background:linear-gradient(160deg,#0B1230,#1B2A7A 60%,#4F2FA0);color:#fff;align-items:center;justify-content:center;text-align:center;gap:12px}
+.ring{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);margin-bottom:8px}
+.light{background:var(--bg);color:var(--text);gap:14px}
+.spl{background:linear-gradient(170deg,#0B1230,#1B1160 55%,#5B21B6);color:#fff;align-items:center;justify-content:center;text-align:center;gap:10px}
+.spl .wm{font-size:38px;font-weight:800;letter-spacing:-.5px}
+.spl .wm span{background:linear-gradient(90deg,#4F6BFF,#A78BFA);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ld{width:120px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:36px}
+.ld i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4F6BFF,#A78BFA);animation:ld 2s ease-out forwards}
+@keyframes ld{to{width:100%}}
+.sc{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-radius:18px;padding:16px;color:var(--text);font-family:inherit}
+.sc .ic{width:52px;height:52px;border-radius:50%;margin:0}
+.sc b{display:block;font-size:16px;margin-bottom:3px}
+.lnk{background:none;border:0;color:var(--pri);font:600 13px system-ui,sans-serif}
+.back{background:none;border:0;color:var(--text);padding:4px 0;align-self:flex-start}
+.fld{display:flex;flex-direction:column;gap:6px}.fld label{font-size:13px;font-weight:600}
+.fld input{border:1px solid var(--bd);background:var(--card);color:var(--text);border-radius:14px;padding:14px 16px;font-size:16px;width:100%}
+.seg{display:flex;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);font:600 14px system-ui,sans-serif;padding:10px;border-radius:10px}
+.seg button.on{background:var(--pri);color:#fff}
+.err{color:var(--bad);font-size:13px;min-height:18px}
+.fld input.otp{letter-spacing:10px;text-align:center;font-size:24px;font-weight:700}
+.empty{background:var(--card);border-radius:16px;padding:16px;text-align:center}
+.offbar{display:none;position:fixed;top:0;left:0;right:0;z-index:20;background:#F59E0B;color:#1a1a1a;text-align:center;font-size:12px;font-weight:600;padding:4px 8px;padding-top:calc(4px + env(safe-area-inset-top,0px))}
+</style>
+</head>
+<body>
+<div id="offbar" class="offbar">You’re offline. Your progress will sync when you’re back online.</div>
+<div id="app"><div id="view"></div>
+<nav class="tabs" id="tabs"></nav></div>
+<div id="over"></div>
+
+<script>
+var ICON={
+home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+sparkles:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/>',
+chart:'<path d="M3 3v18h18"/><path d="M7 15v3M12 10v8M17 6v12"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 4 13c0-6 6-9 16-10 0 10-3 17-9 17z"/><path d="M4 21c3-6 6-9 10-11"/>',
+video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
+pencil:'<path d="M4 20l1-4L17 4l3 3L8 19z"/><path d="M14 7l3 3"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+search:'<circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/>',
+dna:'<path d="M7 3c0 6 10 6 10 18"/><path d="M17 3c0 6-10 6-10 18"/><path d="M9 7h6M9 17h6"/>',
+heart:'<path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z"/>',
+atom:'<circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>',
+link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+flask:'<path d="M9 3h6M10 3v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-10V3"/><path d="M7 15h10"/>',
+zap:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+flame:'<path d="M12 22c4 0 7-3 7-7 0-4-3-6-4-10-3 2-5 5-5 8-1-1-2-2-2-4-2 2-3 4-3 6 0 4 3 7 7 7z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>',
+bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c1 1 1 2 1 3h6c0-1 0-2 1-3A6 6 0 0 0 12 3z"/>',
+triangle:'<path d="M3 20L20 3v17z"/>',
+calc:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M12 11h2M8 15h2M12 15h2M8 19h2M12 19h2"/>',
+type:'<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
+mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/>',
+send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',
+check:'<circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/>',
+xc:'<circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+chev:'<path d="M9 6l6 6-6 6"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+cap:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
+trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+help:'<circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/>',
+landmark:'<path d="M3 21h18M5 21V10M9 21V10M15 21V10M19 21V10M2 10l10-7 10 7z"/>',
+briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20"/>'
+};
+function I(n,s,c){return '<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>'}
+function LOGO(s){return '<svg viewBox="0 0 100 110" width="'+s+'" height="'+Math.round(s*1.1)+'" aria-hidden="true"><defs><linearGradient id="lj" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9A8FF"/></linearGradient><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B8CFF"/><stop offset="1" stop-color="#3B4FD8"/></linearGradient></defs><path d="M60 40V78a20 20 0 0 1-20 20 20 20 0 0 1-17-9" fill="none" stroke="url(#lj)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 38v14c0 7 10 11 22 11s22-4 22-11V38L50 48z" fill="#2B3FB8"/><path d="M50 8L92 26 50 44 8 26z" fill="url(#lc)"/><path d="M86 28v22" stroke="#F5B93A" stroke-width="3" stroke-linecap="round"/><circle cx="86" cy="54" r="4.5" fill="#F5B93A"/></svg>'}
+function A(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')'}
+function box(ico,c,sz,x){return '<div class="ic" style="color:'+c+';background:'+A(c,.16)+';'+(x||'')+'">'+I(ico,sz||22)+'</div>'}
+
+var tab='home',first=true,stream='Science',sub='Biology',ti=0;
+var P=null,ST={streak:0,last:'',total:0,correct:0,sessions:0,goalDay:'',goalN:0,subj:{}};
+var KEY='jamb_prep_v1';
+var SBURL='https://ufwtidcqtbfpsxlknsur.supabase.co',SBKEY='sb_publishable_xWcdliRTISi5YaeGf5G-cg_w7YI16Xb';
+var sb=window.supabase?window.supabase.createClient(SBURL,SBKEY):null,uid=null;
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function writeCache(){if(!uid||!P)return;var q={};Object.keys(SUBJ).forEach(function(k){q[k]=SUBJ[k].q});lsSet('jp_cache',JSON.stringify({uid:uid,P:P,stream:stream,sub:sub,ST:ST,qs:q}))}
+function readCache(){try{var c=JSON.parse(lsGet('jp_cache')||'null');return c&&c.uid&&c.P?c:null}catch(e){return null}}
+function applyCache(c){uid=c.uid;P=c.P;stream=STREAMS[c.stream]?c.stream:'Science';sub=STREAMS[stream].s.indexOf(c.sub)>=0?c.sub:STREAMS[stream].s[0];ST=c.ST;if(!ST.subj)ST.subj={};Object.keys(c.qs||{}).forEach(function(k){if(SUBJ[k]&&c.qs[k]&&c.qs[k].length)SUBJ[k].q=c.qs[k]})}
+function pushAll(){
+ if(!sb||!uid||!navigator.onLine)return Promise.resolve(false);
+ var now=new Date().toISOString();
+ var rows=Object.keys(ST.subj).map(function(k){var r=ST.subj[k];return {user_id:uid,subject:k,answered:r.a,correct:r.c,best_score:r.best,updated_at:now}});
+ var jobs=[
+  sb.from('progress_stats').update({streak:ST.streak,last_active:ST.last||null,total_answered:ST.total,total_correct:ST.correct,sessions:ST.sessions,goal_day:ST.goalDay||null,goal_count:ST.goalN,updated_at:now}).eq('user_id',uid),
+  sb.from('profiles').update({stream:stream,updated_at:now}).eq('id',uid)];
+ if(rows.length)jobs.push(sb.from('subject_progress').upsert(rows));
+ return Promise.all(jobs).then(function(rs){var ok=rs.every(function(r){return !r.error});lsSet('jp_dirty',ok?'0':'1');return ok}).catch(function(){lsSet('jp_dirty','1');return false})
+}
+function save(){writeCache();lsSet('jp_dirty','1');pushAll()}
+function saveStream(){save()}
+function loadAll(cb){
+ Promise.all([
+  sb.from('profiles').select('*').eq('id',uid).maybeSingle(),
+  sb.from('progress_stats').select('*').eq('user_id',uid).maybeSingle(),
+  sb.from('subject_progress').select('*').eq('user_id',uid),
+  sb.from('questions').select('*').order('id')
+ ]).then(function(r){
+  var p=r[0].data;if(!p){cb(false);return}
+  P={name:p.full_name||'Champion',contact:p.contact||'',method:p.contact_method};
+  stream=STREAMS[p.stream]?p.stream:'Science';if(STREAMS[stream].s.indexOf(sub)<0)sub=STREAMS[stream].s[0];
+  var s=r[1].data;ST={streak:0,last:'',total:0,correct:0,sessions:0,goalDay:'',goalN:0,subj:{}};
+  if(s){ST.streak=s.streak;ST.last=s.last_active||'';ST.total=s.total_answered;ST.correct=s.total_correct;ST.sessions=s.sessions;ST.goalDay=s.goal_day||'';ST.goalN=s.goal_count}
+  (r[2].data||[]).forEach(function(x){ST.subj[x.subject]={a:x.answered,c:x.correct,best:x.best_score}});
+  var by={};(r[3].data||[]).forEach(function(x){(by[x.subject]=by[x.subject]||[]).push({q:x.question,o:x.options,a:x.answer_index})});
+  Object.keys(by).forEach(function(k){if(SUBJ[k])SUBJ[k].q=by[k]});
+  writeCache();cb(true)
+ }).catch(function(){cb(false)})
+}
+function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function yest(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function sd(k){return ST.subj[k]||(ST.subj[k]={a:0,c:0,best:0})}
+function nm(){return P?P.name.split(' ')[0]:'Champion'}
+function ini(){return P?P.name.charAt(0).toUpperCase():'?'}
+function gn(){return ST.goalDay===today()?ST.goalN:0}
+function pp(k){var s=ST.subj[k];return s?Math.round(s.best/SUBJ[k].q.length*100):0}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+var TABS=[['home','home','Home'],['subjects','book','Subjects'],['ai','sparkles','AI Tutor'],['profile','user','Profile']];
+var STREAMS={
+ 'Science':{n:'Science',d:'English, Maths, Biology, Chemistry, Physics, etc.',ic:'flask',c:'#4F6BFF',s:['Biology','Chemistry','Physics','Mathematics','English Language']},
+ 'Arts':{n:'Arts / Humanities',d:'Literature, Government, History, CRS, etc.',ic:'book',c:'#8B5CF6',s:['Literature','Government','English Language']},
+ 'Commercial':{n:'Commercial',d:'Accounting, Commerce, Economics, etc.',ic:'chart',c:'#14B8A6',s:['Economics','Mathematics','English Language']}};
+var SUBJ={
+'Biology':{i:'leaf',s:'Science Stream',p:65,t:[['Cell Structure and Function',2,4,'search'],['Genetics',0,5,'dna'],['Human Physiology',0,6,'heart'],['Ecology',0,4,'leaf']],q:[
+ {q:'Which of the following is the main function of the cell membrane?',o:['Protein synthesis','Selective transport','Energy production','Waste removal'],a:1},
+ {q:'Which organelle is the site of photosynthesis?',o:['Mitochondrion','Ribosome','Chloroplast','Nucleus'],a:2},
+ {q:'Which gas do plants take in for photosynthesis?',o:['Oxygen','Nitrogen','Carbon dioxide','Hydrogen'],a:2},
+ {q:'Which blood cells help to fight infection?',o:['Red blood cells','White blood cells','Platelets','Plasma'],a:1}]},
+'Chemistry':{i:'flask',s:'Science Stream',p:68,t:[['Atomic Structure',1,4,'atom'],['Acids, Bases and Salts',0,5,'flask'],['Chemical Bonding',0,4,'link'],['Organic Chemistry',0,6,'flame']],q:[
+ {q:'What is the chemical symbol for sodium?',o:['So','Na','S','Sd'],a:1},
+ {q:'What is the pH of a neutral solution?',o:['0','7','14','1'],a:1},
+ {q:'Which gas is produced when zinc reacts with dilute hydrochloric acid?',o:['Oxygen','Carbon dioxide','Hydrogen','Chlorine'],a:2},
+ {q:'Which type of bond forms when electrons are shared?',o:['Ionic','Covalent','Metallic','Hydrogen'],a:1}]},
+'Physics':{i:'zap',s:'Science Stream',p:70,t:[['Motion and Forces',2,5,'trend'],['Heat and Energy',0,4,'flame'],['Light and Waves',0,5,'sun'],['Electricity',0,6,'bulb']],q:[
+ {q:'What is the SI unit of force?',o:['Joule','Newton','Watt','Pascal'],a:1},
+ {q:'Speed is distance divided by what?',o:['Mass','Time','Force','Area'],a:1},
+ {q:'Which of these is a vector quantity?',o:['Mass','Time','Velocity','Energy'],a:2},
+ {q:'What is the bending of light as it passes from one medium to another called?',o:['Reflection','Refraction','Diffraction','Dispersion'],a:1}]},
+'Mathematics':{i:'calc',s:'All Streams',p:85,t:[['Algebra',3,5,'calc'],['Geometry',2,4,'triangle'],['Statistics',0,4,'chart'],['Trigonometry',0,5,'triangle']],q:[
+ {q:'Solve for x: 2x + 6 = 14',o:['3','4','5','8'],a:1},
+ {q:'What is 15% of 200?',o:['20','25','30','35'],a:2},
+ {q:'What is the sum of the angles in a triangle?',o:['90°','180°','270°','360°'],a:1},
+ {q:'What is the square root of 144?',o:['10','11','12','14'],a:2}]},
+'English Language':{i:'book',s:'All Streams',p:90,t:[['Comprehension',3,4,'file'],['Grammar',2,5,'pencil'],['Vocabulary',1,4,'type'],['Oral English',0,4,'mic']],q:[
+ {q:'Choose the word that is opposite in meaning to “generous”.',o:['Kind','Stingy','Rich','Gentle'],a:1},
+ {q:'Choose the correct sentence.',o:['She go to school every day.','She goes to school every day.','She going to school every day.','She gone to school every day.'],a:1},
+ {q:'A word that has the same meaning as another word is called a what?',o:['Antonym','Synonym','Homonym','Acronym'],a:1},
+ {q:'Identify the noun in this sentence: “The quick fox ran away.”',o:['quick','ran','fox','away'],a:2}]},
+'Literature':{i:'pencil',s:'Arts Stream',p:55,t:[['Prose',1,4,'book'],['Poetry',0,4,'type'],['Drama',0,4,'mic'],['Literary Devices',0,3,'pencil']],q:[
+ {q:'A story told in the first person uses which pronoun?',o:['He','She','I','They'],a:2},
+ {q:'A comparison that uses “like” or “as” is called a what?',o:['Metaphor','Simile','Irony','Proverb'],a:1},
+ {q:'A fourteen-line poem is called a what?',o:['Ode','Sonnet','Elegy','Ballad'],a:1}]},
+'Government':{i:'landmark',s:'Arts Stream',p:60,t:[['Arms of Government',1,4,'landmark'],['Constitutions',0,4,'file'],['Elections',0,3,'check'],['International Bodies',0,4,'globe']],q:[
+ {q:'Who is the head of the executive arm in a presidential system?',o:['Chief Justice','President','Senate President','Speaker'],a:1},
+ {q:'Which arm of government makes laws?',o:['Executive','Judiciary','Legislature','Civil service'],a:2},
+ {q:'Which of these is a function of the judiciary?',o:['Making laws','Interpreting laws','Collecting taxes','Printing money'],a:1}]},
+'Economics':{i:'chart',s:'Commercial Stream',p:62,t:[['Demand and Supply',1,4,'trend'],['Production',0,4,'briefcase'],['Money and Banking',0,4,'chart'],['Public Finance',0,3,'landmark']],q:[
+ {q:'What is the study of how people use scarce resources to meet unlimited wants called?',o:['Economics','Sociology','Politics','Geography'],a:0},
+ {q:'When the price of a good rises, quantity demanded usually does what?',o:['Rises','Falls','Stays the same','Doubles'],a:1},
+ {q:'Which of these is a factor of production?',o:['Land','Inflation','Tax','Budget'],a:0}]}};
+var Q=[],qi=0,picked=null,score=0;
+var STEPS=[
+ ['Hi, I’m your AI guide','Let me show you around Jamb Prep App in under a minute.'],
+ ['Home','Pick up where you left off and hit your daily goal.'],
+ ['Subjects','Notes, video lessons and past questions for every subject in your stream.'],
+ ['Practice','Answer JAMB-style questions and get instant feedback.'],
+ ['AI Tutor','Stuck on a topic? Ask me anything and I will explain it simply.'],
+ ['Profile','Track your streak, scores and progress. You are ready, Champion.']];
+
+function go(t){tab=t;render()}
+function setSub(k){sub=k;render()}
+function tile(c,ico,t,s,f){return '<button class="tile" style="background:'+A(c,.1)+'" onclick="'+f+'">'+box(ico,c)+'<b>'+t+'</b><span class="tiny">'+s+'</span></button>'}
+
+var pages={
+home:function(){return '<div class="row"><div class="av">'+ini()+'</div><div style="flex:1"><b>Hello, '+nm()+'!</b><div class="muted">Great things take practice.</div></div>'+I('bell',24)+'</div>'+
+ '<div class="hero"><h2>Your JAMB journey<br>starts here!</h2><p>Study. Practice. Improve.</p><button class="btn" onclick="startQuiz()">Continue Learning '+I('arrow',16)+'</button></div>'+
+ '<div class="grid">'+tile('#4F6BFF','grid','All Subjects',STREAMS[stream].s.length+' Subjects',"go('subjects')")+
+ tile('#F97316','file','Practice Questions','Past Questions &amp; Mock Tests','startQuiz()')+
+ tile('#8B5CF6','sparkles','AI Tutor','Ask Anything',"go('ai')")+
+ tile('#22C55E','chart','Progress','Track Your Growth',"go('profile')")+'</div>'+
+ '<div class="card"><div class="between"><b>Today’s Goal</b><span class="muted">'+gn()+'/3 sessions</span></div><div class="bar" style="margin-top:10px"><i style="width:'+Math.min(100,gn()/3*100)+'%"></i></div></div>'},
+
+subjects:function(){
+ var d=SUBJ[sub],T=d.t,L=STREAMS[stream].s;
+ return '<div class="chips">'+L.map(function(k){return '<button class="chip2'+(k===sub?' on':'')+'" onclick="setSub(\''+k+'\')">'+k+'</button>'}).join('')+'</div>'+
+ '<div class="between"><div class="row">'+box(d.i,'#4F6BFF',26,'margin:0;width:52px;height:52px')+'<div><h1>'+sub+'</h1><div class="muted">'+d.s+'</div></div></div><button class="lnk" onclick="streams()">Change stream</button></div>'+
+ '<div class="row"><div class="bar" style="flex:1;height:8px"><i style="width:'+pp(sub)+'%"></i></div><b>'+pp(sub)+'%</b></div>'+
+ '<div class="res"><button>'+box('file','#4F6BFF')+'Study Notes</button><button>'+box('video','#EC4899')+'Video Lessons</button><button onclick="startQuiz()">'+box('pencil','#14B8A6')+'Practice Questions</button><button onclick="startQuiz()">'+box('clock','#F97316')+'Past Questions</button></div>'+
+ '<div class="between"><h2>Recent Topics</h2><span style="color:var(--pri);font-weight:600;font-size:14px">View All</span></div>'+
+ T.map(function(x){return '<div class="card topic">'+box(x[3],'#4F6BFF',18)+'<div style="flex:1"><b>'+x[0]+'</b><span class="tiny">0/'+x[2]+' lessons completed</span></div><span style="color:var(--muted)">'+I('chev',18)+'</span></div>'}).join('')},
+
+ai:function(){return '<div class="row" style="padding-bottom:12px;border-bottom:1px solid var(--bd)"><div class="av ai">AI</div><div><b>Jamb Prep AI Tutor</b><div class="tiny">Ask me anything about JAMB.</div></div></div>'+
+ '<div class="chat" id="chat"><div class="b bot">Hi Champion! Ask me anything about your JAMB subjects.</div></div>'+
+ '<div class="inp"><input id="q" placeholder="Type your question..." onkeydown="if(event.key===\'Enter\')send()"><button onclick="send()" aria-label="Send">'+I('send',18)+'</button></div>'},
+
+profile:function(){
+ var S=STREAMS[stream].s,has=ST.total>0,pal=['#4F6BFF','#22C55E','#8B5CF6','#F97316','#14B8A6'];
+ function st(c,ico,l,v,u){return '<div class="stat" style="background:'+A(c,.12)+'"><span style="color:'+c+'">'+I(ico,26)+'</span><div class="tiny">'+l+'</div><strong>'+v+'</strong><span class="tiny">'+u+'</span></div>'}
+ var avg=has?Math.round(ST.correct/ST.total*100)+'%':'0%';
+ return '<div class="between"><div class="av">'+ini()+'</div><span style="color:var(--text)">'+I('settings',22)+'</span></div>'+
+ '<div><h1>'+(has?'Well Done, '+nm()+'!':'Welcome, '+nm()+'!')+'</h1><div class="muted">'+(has?'You’re making great progress!':'Start practising to see your progress here.')+'</div></div>'+
+ '<div class="card" style="font-size:14px"><b>'+esc(P.name)+'</b><div class="muted" style="margin-top:2px">'+esc(P.contact)+' · Verified</div><div class="muted">'+STREAMS[stream].n+' stream</div></div>'+
+ '<div class="stats">'+st('#F97316','flame','Learning Streak',ST.streak,'Days')+st('#4F6BFF','help','Total Questions',ST.total,'Answered')+st('#22C55E','trend','Average Score',avg,has?'Overall':'No data yet')+'</div>'+
+ '<h2>Performance Overview</h2>'+(has?'':'<div class="empty muted">Complete a practice session to see your scores by subject.</div>')+
+ S.map(function(k,i){var s=ST.subj[k],p=s&&s.a?Math.round(s.c/s.a*100):0;return '<div><div class="between" style="margin-bottom:6px"><b style="font-size:13px">'+k+'</b><b style="font-size:13px">'+p+'%</b></div><div class="bar"><i style="width:'+p+'%;background:'+pal[i%5]+'"></i></div></div>'}).join('')+
+ '<button class="lnk" style="align-self:flex-start;margin-top:8px" onclick="signOut()">Sign out</button>'
+},
+profileOld:function(){
+ var S=[['Mathematics',85,'#4F6BFF'],['English Language',90,'#3B82F6'],['Biology',72,'#22C55E'],['Chemistry',68,'#EF4444'],['Physics',70,'#8B5CF6']];
+ function st(c,ico,l,v,u){return '<div class="stat" style="background:'+A(c,.12)+'"><span style="color:'+c+'">'+I(ico,26)+'</span><div class="tiny">'+l+'</div><strong>'+v+'</strong><span class="tiny">'+u+'</span></div>'}
+ return '<div class="between"><div class="av">'+I('user',22)+'</div><span style="color:var(--text)">'+I('settings',22)+'</span></div><div><h1>Well Done, Champion!</h1><div class="muted">You’re making great progress!</div></div>'+
+ '<div class="stats">'+st('#F97316','flame','Learning Streak','5','Days')+st('#4F6BFF','help','Total Questions','320','Answered')+st('#22C55E','trend','Average Score','78%','Improvement')+'</div>'+
+ '<h2>Performance Overview</h2>'+S.map(function(x){return '<div><div class="between" style="margin-bottom:6px"><b style="font-size:13px">'+x[0]+'</b><b style="font-size:13px">'+x[1]+'%</b></div><div class="bar"><i style="width:'+x[1]+'%;background:'+x[2]+'"></i></div></div>'}).join('')}
+};
+
+function render(){
+ document.getElementById('view').innerHTML=pages[tab]();
+ document.getElementById('tabs').innerHTML=TABS.map(function(t){return '<button class="'+(t[0]===tab?'on':'')+'" onclick="go(\''+t[0]+'\')">'+I(t[1],22)+t[2]+'</button>'}).join('');
+}
+
+function send(){
+ var i=document.getElementById('q'),c=document.getElementById('chat'),q=i.value.trim();if(!q)return;i.value='';
+ c.insertAdjacentHTML('beforeend','<div class="b me"></div>');c.lastChild.textContent=q;
+ setTimeout(function(){c.insertAdjacentHTML('beforeend','<div class="b bot"></div>');
+  c.lastChild.textContent='You asked: “'+q+'”. Real answers will appear once this is connected to a backend.';c.scrollTop=c.scrollHeight},600);
+ c.scrollTop=c.scrollHeight}
+
+function closeOv(){document.getElementById('over').innerHTML='';render()}
+function endTour(){first=false;try{localStorage.setItem('jp_tour','1')}catch(e){}closeOv()}
+
+function startQuiz(){Q=SUBJ[sub].q;qi=0;picked=null;score=0;quiz()}
+function pick(n){if(picked!==null)return;picked=n;var s=sd(sub);s.a++;ST.total++;if(n===Q[qi].a){score++;s.c++;ST.correct++}save();quiz()}
+function finish(){var s=sd(sub);if(score>s.best)s.best=score;ST.sessions++;var t=today();if(ST.goalDay!==t){ST.goalDay=t;ST.goalN=0}ST.goalN++;if(ST.last!==t){ST.streak=(ST.last===yest())?ST.streak+1:1;ST.last=t}save()}
+function nextQ(){picked=null;qi++;if(qi>=Q.length)finish();quiz()}
+function quiz(){
+ var o=document.getElementById('over');
+ if(qi>=Q.length){o.innerHTML='<div class="ov quiz" style="align-items:center;justify-content:center"><div style="font-size:56px;font-weight:800">'+score+'/'+Q.length+'</div><div style="color:#C9D2FF">Nice work, Champion!</div><button class="btn" style="margin-top:24px" onclick="closeOv()">Back to Home</button></div>';return}
+ var x=Q[qi];
+ o.innerHTML='<div class="ov quiz"><div class="row"><button onclick="closeOv()" aria-label="Close" style="background:none;border:0;color:#fff">'+I('x',22)+'</button><b style="flex:1">'+sub+'</b><span style="color:#C9D2FF">'+(qi+1)+'/'+Q.length+'</span></div>'+
+ '<div style="height:5px;border-radius:3px;background:#1E2A5E"><div style="height:5px;border-radius:3px;background:#38BDF8;width:'+((qi+1)/Q.length*100)+'%"></div></div>'+
+ '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p></div>'+
+ x.o.map(function(t,n){var cl=picked===null?'':(n===x.a?' ok':(picked===n?' no':''));return '<button class="opt'+cl+'" onclick="pick('+n+')"><i>'+'ABCD'[n]+'</i><span style="flex:1">'+t+'</span>'+(cl===' ok'?I('check',22,'#22C55E'):cl===' no'?I('xc',22,'#EF4444'):'')+'</button>'}).join('')+
+ '<div style="flex:1"></div><button class="btn" style="padding:16px;font-size:16px;opacity:'+(picked===null?.5:1)+'" '+(picked===null?'disabled':'')+' onclick="nextQ()">'+(qi===Q.length-1?'Finish':'Next')+'</button></div>'}
+
+function tour(){
+ var s=STEPS[ti],last=ti===STEPS.length-1;
+ document.getElementById('over').innerHTML='<div class="ov tour"><div class="tc"><div class="row"><div class="av ai">AI</div><h2 style="flex:1">'+s[0]+'</h2></div>'+
+ '<p class="muted" style="font-size:15px;line-height:1.5;margin-top:12px">'+s[1]+'</p><div class="dots">'+STEPS.map(function(_,n){return '<i class="'+(n===ti?'on':'')+'"></i>'}).join('')+'</div>'+
+ '<div class="between">'+(last?'<span></span>':'<button onclick="endTour()" style="background:none;border:0;color:var(--muted);font-weight:600;font-size:14px">Skip</button>')+
+ '<button class="btn" onclick="'+(last?'endTour()':'ti++;tour()')+'">'+(last?'Let’s go':'Next')+'</button></div></div></div>'}
+
+function welcome(){document.getElementById('over').innerHTML='<div class="ov wel"><div style="margin-bottom:8px">'+LOGO(104)+'</div><div style="font-size:20px">Welcome to</div><h1 style="font-size:36px">Jamb Prep App</h1><p style="color:#C9D2FF;line-height:1.5;max-width:300px">Your all-in-one JAMB study companion. Prep smarter, ace higher!</p><button class="btn" style="width:100%;padding:16px;font-size:16px;margin-top:30px" onclick="D.login=false;streams()">Get Started</button><button onclick="loginStart()" style="background:none;border:0;color:#9DB0FF;font-weight:600;font-size:14px;padding:8px">I already have an account</button></div>'}
+
+function streams(){
+ document.getElementById('over').innerHTML='<div class="ov light"><button class="back" onclick="'+(first?'welcome()':'closeOv()')+'" aria-label="Back">'+I('back',24)+'</button>'+
+ '<div><h1 style="font-size:26px">Select Your Stream</h1><p class="muted" style="margin-top:6px;font-size:14px">Choose your preferred JAMB stream to get relevant subjects and study plans.</p></div>'+
+ Object.keys(STREAMS).map(function(k){var x=STREAMS[k];return '<button class="sc" style="background:'+A(x.c,.1)+'" onclick="pickStream(\''+k+'\')">'+box(x.ic,x.c,24)+'<div style="flex:1"><b>'+x.n+'</b><span class="muted">'+x.d+'</span></div><span style="color:'+x.c+'">'+I('chev',20)+'</span></button>'}).join('')+'</div>'}
+
+function pickStream(k){stream=k;sub=STREAMS[k].s[0];if(!P){setup()}else if(first){ti=0;tour()}else{saveStream();closeOv()}}
+
+function splash(){document.getElementById('over').innerHTML='<div class="ov spl">'+LOGO(120)+'<div class="wm">Jamb <span>Prep App</span></div><p style="color:#C9D2FF;line-height:1.7;margin-top:8px">Learn Smarter.<br>Score Higher.<br>Build Your Future.</p><div class="ld"><i></i></div></div>';setTimeout(welcome,2200)}
+
+var D={m:'email',name:'',val:'',login:false},T=null;
+function friendly(m){if(/rate limit|seconds|too many/i.test(m))return 'Please wait a minute before asking for another code.';if(/signups not allowed|not found/i.test(m))return 'No account found for this email. Go back and create one.';if(/expired|invalid/i.test(m))return 'That code is wrong or has expired. Request a new one.';return m}
+function loginStart(){D={m:'email',name:'',val:'',login:true};setup()}
+function grab(){var n=document.getElementById('nm'),v=document.getElementById('cv');if(n)D.name=n.value;if(v)D.val=v.value}
+function setM(m){grab();D.m=m;setup()}
+function setup(err){
+ var em=D.m==='email';
+ document.getElementById('over').innerHTML='<div class="ov light"><button class="back" onclick="'+(D.login?'welcome()':'streams()')+'" aria-label="Back">'+I('back',24)+'</button>'+
+ '<div><h1 style="font-size:26px">'+(D.login?'Welcome back':'Create Your Profile')+'</h1><p class="muted" style="margin-top:6px;font-size:14px">'+(D.login?'Enter your email and we’ll send you a code.':'Tell us who you are, then verify your email.')+'</p></div>'+
+ (D.login?'':'<div class="fld"><label for="nm">Full name</label><input id="nm" autocomplete="name" placeholder="e.g. Ada Okafor" value="'+esc(D.name)+'"></div>')+
+ '<div class="seg"><button class="'+(em?'on':'')+'" onclick="setM(\'email\')">Email</button><button class="'+(em?'':'on')+'" onclick="setM(\'phone\')">Phone number</button></div>'+
+ (em?'<div class="fld"><label for="cv">Email address</label><input id="cv" type="email" inputmode="email" autocomplete="email" autocapitalize="none" placeholder="you@example.com" value="'+esc(D.val)+'"></div>':'<div class="card muted" style="font-size:13px">Phone verification is coming soon. It needs a text-message service to be set up. Please use your email for now.</div>')+
+ '<div class="err" id="er">'+(err||'')+'</div><button class="btn" id="sb" style="padding:16px;font-size:16px;'+(em?'':'opacity:.5')+'" '+(em?'':'disabled')+' onclick="sendCode()">Send verification code</button></div>'}
+function sendCode(){grab();var v=D.val.trim().toLowerCase(),n=D.name.trim();
+ if(D.m!=='email')return;
+ if(!sb||!navigator.onLine)return setup('You need an internet connection to sign in.');
+ if(!D.login&&n.length<2)return setup('Please enter your name.');
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v))return setup('Enter a valid email address.');
+ D.val=v;var b=document.getElementById('sb');if(b){b.disabled=true;b.textContent='Sending…'}
+ sb.auth.signInWithOtp({email:v,options:{shouldCreateUser:!D.login,data:{full_name:n,stream:stream}}}).then(function(r){
+  if(r.error)return setup(friendly(r.error.message));
+  verify()}).catch(function(){setup('Could not reach the server. Check your internet and try again.')})}
+function mask(){var p=D.val.split('@');return p[0].charAt(0)+'***@'+p[1]}
+function verify(err){clearInterval(T);var left=60;
+ document.getElementById('over').innerHTML='<div class="ov light"><button class="back" onclick="setup()" aria-label="Back">'+I('back',24)+'</button><div><h1 style="font-size:26px">Verify your email</h1><p class="muted" style="margin-top:6px;font-size:14px">Enter the code we sent to '+esc(mask())+'. Check your spam folder if you don’t see it.</p></div>'+
+ '<div class="fld"><label for="otp">Verification code</label><input id="otp" class="otp" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="••••••"></div>'+
+ '<div class="err" id="er">'+(err||'')+'</div><button class="btn" id="vb" style="padding:16px;font-size:16px" onclick="check()">Verify</button>'+
+ '<div class="muted" style="text-align:center" id="rs">Resend code in 60s</div></div>';
+ T=setInterval(function(){left--;var r=document.getElementById('rs');if(!r){clearInterval(T);return}if(left>0)r.textContent='Resend code in '+left+'s';else{clearInterval(T);r.innerHTML='<button class="lnk" onclick="sendCode()">Resend code</button>'}},1000)}
+function check(){var c=document.getElementById('otp').value.replace(/\D/g,'');
+ if(c.length<6)return verify('Enter the code from your email.');
+ var b=document.getElementById('vb');if(b){b.disabled=true;b.textContent='Verifying…'}
+ sb.auth.verifyOtp({email:D.val,token:c,type:'email'}).then(function(r){
+  if(r.error||!r.data||!r.data.user)return verify(friendly(r.error?r.error.message:'Verification failed.'));
+  clearInterval(T);uid=r.data.user.id;var oc=readCache();if(oc&&oc.uid!==uid){lsDel('jp_cache');lsDel('jp_dirty')}
+  loadAll(function(ok){
+   if(!ok)return verify('Signed in, but your profile could not load. Try again.');
+   var seen=false;try{seen=localStorage.getItem('jp_tour')==='1'}catch(e){}
+   first=!seen;if(first){ti=0;tour()}else{closeOv()}})
+ }).catch(function(){verify('Could not reach the server. Check your internet and try again.')})}
+function signOut(){
+ var done=function(){uid=null;P=null;ST={streak:0,last:'',total:0,correct:0,sessions:0,goalDay:'',goalN:0,subj:{}};lsDel('jp_cache');lsDel('jp_dirty');first=true;tab='home';stream='Science';sub='Biology';D={m:'email',name:'',val:'',login:false};render();splash()};
+ if(!sb){done();return}
+ sb.auth.signOut().then(done).catch(done)}
+
+document.getElementById('over').innerHTML='<div class="ov spl"></div>';
+render();
+function enterApp(){first=false;closeOv()}
+function startOffline(){var c=readCache();if(c){applyCache(c);enterApp()}else splash()}
+function startOnline(ss){
+ uid=ss.user.id;var c=readCache();
+ if(c&&c.uid===uid){
+  applyCache(c);enterApp();
+  var refresh=function(){loadAll(function(ok){if(ok)render()})};
+  if(lsGet('jp_dirty')==='1')pushAll().then(refresh);else refresh();
+ }else loadAll(function(ok){if(ok)enterApp();else splash()})}
+if(!sb){startOffline()}else sb.auth.getSession().then(function(r){
+ var ss=r.data&&r.data.session;
+ if(ss)startOnline(ss);else if(!navigator.onLine)startOffline();else{lsDel('jp_cache');splash()}
+}).catch(startOffline);
+
+function offBar(){var b=document.getElementById('offbar');if(b)b.style.display=navigator.onLine?'none':'block'}
+window.addEventListener('online',function(){offBar();if(lsGet('jp_dirty')==='1')pushAll()});
+window.addEventListener('offline',offBar);
+offBar();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
