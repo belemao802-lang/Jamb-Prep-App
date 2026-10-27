@@ -14,7 +14,7 @@
       topics:s.topics.map(function(topic,i){
         return {
           name:topic,
-          note:"Study focus: "+topic+". Learn the key terms and definitions, explain the underlying principles, study representative examples, and practise applying the ideas to unfamiliar JAMB-style questions. For calculation topics, learn the relevant formula, units, assumptions and each step of the working. For text-based topics, distinguish the main idea from supporting details and check important terminology.",
+          note:"In "+name+", study "+topic+" in the context of "+s.desc+". Identify the key terms and principles, explain how they work, and practise applying them to examples. For numerical topics, show the formula, units, substitution and working; for language and humanities topics, use accurate terminology and support answers with evidence or examples. Compare your explanation with a trusted textbook and the current JAMB syllabus.",
           revision:["Define the key terms in "+topic+".","Explain the main principles and give at least two examples.","Practise a question, check your reasoning, and revise any mistakes."],
           questions: i===0 ? s.questions : []
         };
