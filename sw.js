@@ -1,7 +1,7 @@
 // Jamb Prep App - makes the app work offline after the first visit
-const V = 'jp-v1';
+const V = 'jp-v2';
 const CORE = [
-  './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
+  './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'content/jamb-catalog.js',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'
 ];
 self.addEventListener('install', (e) => {
