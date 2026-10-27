@@ -140,6 +140,8 @@ function box(ico,c,sz,x){return '<div class="ic" style="color:'+c+';background:'
 
 var tab='home',first=true,stream='Science',sub='Biology',ti=0;
 var P=null,ST={streak:0,last:'',total:0,correct:0,sessions:0,goalDay:'',goalN:0,subj:{}};
+var BOOKMARKS=[],MISTAKES=[];
+try{BOOKMARKS=JSON.parse(localStorage.getItem('jp_bookmarks')||'[]');MISTAKES=JSON.parse(localStorage.getItem('jp_mistakes')||'[]')}catch(e){BOOKMARKS=[];MISTAKES=[]}
 var KEY='jamb_prep_v1';
 var SBURL='https://ufwtidcqtbfpsxlknsur.supabase.co',SBKEY='sb_publishable_xWcdliRTISi5YaeGf5G-cg_w7YI16Xb';
 var sb=window.supabase?window.supabase.createClient(SBURL,SBKEY):null,uid=null;
@@ -159,7 +161,7 @@ function pushAll(){
  if(rows.length)jobs.push(sb.from('subject_progress').upsert(rows));
  return Promise.all(jobs).then(function(rs){var ok=rs.every(function(r){return !r.error});lsSet('jp_dirty',ok?'0':'1');return ok}).catch(function(){lsSet('jp_dirty','1');return false})
 }
-function save(){writeCache();lsSet('jp_dirty','1');pushAll()}
+function save(){writeCache();lsSet('jp_bookmarks',JSON.stringify(BOOKMARKS));lsSet('jp_mistakes',JSON.stringify(MISTAKES));lsSet('jp_dirty','1');pushAll()}
 function saveStream(){save()}
 function loadAll(cb){
  Promise.all([
@@ -249,7 +251,9 @@ home:function(){return '<div class="row"><div class="av">'+ini()+'</div><div sty
  '<div class="grid">'+tile('#4F6BFF','grid','All Subjects',STREAMS[stream].s.length+' Subjects',"go('subjects')")+
  tile('#F97316','file','Practice Questions','Past Questions &amp; Mock Tests','startQuiz()')+
  tile('#8B5CF6','sparkles','AI Tutor','Ask Anything',"go('ai')")+
- tile('#22C55E','chart','Progress','Track Your Growth',"go('profile')")+'</div>'+
+ tile('#22C55E','chart','Progress','Track Your Growth',"go('profile')")+
+ tile('#0EA5E9','bookmark','Revision Notebook',BOOKMARKS.length+' saved · '+MISTAKES.length+' missed','openNotebook()')+
+ tile('#F59E0B','target','Daily Challenge','Practise today','startChallenge()')+'</div>'+
  '<div class="card"><div class="between"><b>Today’s Goal</b><span class="muted">'+gn()+'/3 sessions</span></div><div class="bar" style="margin-top:10px"><i style="width:'+Math.min(100,gn()/3*100)+'%"></i></div></div>'},
 
 subjects:function(){
@@ -292,6 +296,7 @@ function render(){
 
 function send(){
  var i=document.getElementById('q'),c=document.getElementById('chat'),q=i.value.trim();if(!q)return;i.value='';
+ if(!navigator.onLine){c.insertAdjacentHTML('beforeend','<div class="b bot">AI Tutor needs an internet connection. Your offline notes and practice questions still work.</div>');c.scrollTop=c.scrollHeight;return;}
  c.insertAdjacentHTML('beforeend','<div class="b me"></div>');c.lastChild.textContent=q;
  setTimeout(function(){c.insertAdjacentHTML('beforeend','<div class="b bot"></div>');
   c.lastChild.textContent='You asked: “'+q+'”. Real answers will appear once this is connected to a backend.';c.scrollTop=c.scrollHeight},600);
@@ -301,16 +306,24 @@ function closeOv(){document.getElementById('over').innerHTML='';render()}
 function endTour(){first=false;try{localStorage.setItem('jp_tour','1')}catch(e){}closeOv()}
 
 function startQuiz(){Q=SUBJ[sub].q;qi=0;picked=null;score=0;quiz()}
-function pick(n){if(picked!==null)return;picked=n;var s=sd(sub);s.a++;ST.total++;if(n===Q[qi].a){score++;s.c++;ST.correct++}save();quiz()}
+function startChallenge(){var all=[];STREAMS[stream].s.forEach(function(k){if(SUBJ[k])SUBJ[k].q.forEach(function(x){all.push({subject:k,item:x})})});Q=all.slice(0,Math.min(5,all.length)).map(function(x){return Object.assign({},x.item,{_subject:x.subject})});sub='Daily Challenge';qi=0;picked=null;score=0;quiz()}
+function toggleBookmark(){var x=Q[qi],subject=x._subject||sub,key=subject+'|'+x.q,at=BOOKMARKS.findIndex(function(b){return b.key===key});if(at>=0)BOOKMARKS.splice(at,1);else BOOKMARKS.push({key:key,subject:subject,q:x.q,o:x.o,a:x.a});save();quiz()}
+function openNotebook(){var rows='<div class="between"><h1>Revision Notebook</h1><button class="lnk" onclick="closeOv()">Close</button></div><p class="muted">Saved questions and questions to revisit are stored on this device.</p><h2>Bookmarked questions ('+BOOKMARKS.length+')</h2>';
+ rows+=BOOKMARKS.length?BOOKMARKS.map(function(x,i){return '<div class="card"><div class="tiny">'+esc(x.subject)+'</div><b>'+esc(x.q)+'</b><div class="muted" style="margin-top:8px">Answer: '+esc(x.o[x.a]||'')+'</div><button class="lnk" style="margin-top:8px" onclick="removeBookmark('+i+')">Remove bookmark</button></div>'}).join(''):'<div class="card muted">No bookmarks yet. Tap the star while practising to save a question.</div>';
+ rows+='<h2>Questions to revisit ('+MISTAKES.length+')</h2>';
+ rows+=MISTAKES.length?MISTAKES.slice().reverse().map(function(x){return '<div class="card"><div class="tiny">'+esc(x.subject)+'</div><b>'+esc(x.q)+'</b><div class="muted" style="margin-top:8px">Correct answer: '+esc(x.o[x.a]||'')+'</div></div>'}).join(''):'<div class="card muted">Missed questions appear here after incorrect answers.</div>';
+ document.getElementById('over').innerHTML='<div class="ov light">'+rows+'</div>'}
+function removeBookmark(i){BOOKMARKS.splice(i,1);save();openNotebook()}
+function pick(n){if(picked!==null)return;picked=n;var x=Q[qi],subject=x._subject||sub,s=sd(subject);s.a++;ST.total++;if(n===x.a){score++;s.c++;ST.correct++}else{var key=subject+'|'+x.q;if(!MISTAKES.some(function(m){return m.key===key}))MISTAKES.push({key:key,subject:subject,q:x.q,o:x.o,a:x.a});if(MISTAKES.length>200)MISTAKES.shift()}save();quiz()}
 function finish(){var s=sd(sub);if(score>s.best)s.best=score;ST.sessions++;var t=today();if(ST.goalDay!==t){ST.goalDay=t;ST.goalN=0}ST.goalN++;if(ST.last!==t){ST.streak=(ST.last===yest())?ST.streak+1:1;ST.last=t}save()}
 function nextQ(){picked=null;qi++;if(qi>=Q.length)finish();quiz()}
 function quiz(){
  var o=document.getElementById('over');
  if(qi>=Q.length){o.innerHTML='<div class="ov quiz" style="align-items:center;justify-content:center"><div style="font-size:56px;font-weight:800">'+score+'/'+Q.length+'</div><div style="color:#C9D2FF">Nice work, Champion!</div><button class="btn" style="margin-top:24px" onclick="closeOv()">Back to Home</button></div>';return}
  var x=Q[qi];
- o.innerHTML='<div class="ov quiz"><div class="row"><button onclick="closeOv()" aria-label="Close" style="background:none;border:0;color:#fff">'+I('x',22)+'</button><b style="flex:1">'+sub+'</b><span style="color:#C9D2FF">'+(qi+1)+'/'+Q.length+'</span></div>'+
+ o.innerHTML='<div class="ov quiz"><div class="row"><button onclick="closeOv()" aria-label="Close" style="background:none;border:0;color:#fff">'+I('x',22)+'</button><b style="flex:1">'+(Q[qi]._subject||sub)+'</b><button onclick="toggleBookmark()" aria-label="Bookmark question" style="background:none;border:0;color:'+(BOOKMARKS.some(function(b){return b.key===((Q[qi]._subject||sub)+'|'+Q[qi].q)})?'#FBBF24':'#fff')+';font-size:20px">★</button><span style="color:#C9D2FF">'+(qi+1)+'/'+Q.length+'</span></div>'+
  '<div style="height:5px;border-radius:3px;background:#1E2A5E"><div style="height:5px;border-radius:3px;background:#38BDF8;width:'+((qi+1)/Q.length*100)+'%"></div></div>'+
- '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p></div>'+
+ '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p>'+(picked===null?'':'<p style="margin-top:12px;color:'+(picked===x.a?'#86EFAC':'#FCA5A5')+';font-size:13px;font-weight:600">'+(picked===x.a?'Correct!':'Not quite. Correct answer: '+esc(x.o[x.a]))+'</p>')+'</div>'+
  x.o.map(function(t,n){var cl=picked===null?'':(n===x.a?' ok':(picked===n?' no':''));return '<button class="opt'+cl+'" onclick="pick('+n+')"><i>'+'ABCD'[n]+'</i><span style="flex:1">'+t+'</span>'+(cl===' ok'?I('check',22,'#22C55E'):cl===' no'?I('xc',22,'#EF4444'):'')+'</button>'}).join('')+
  '<div style="flex:1"></div><button class="btn" style="padding:16px;font-size:16px;opacity:'+(picked===null?.5:1)+'" '+(picked===null?'disabled':'')+' onclick="nextQ()">'+(qi===Q.length-1?'Finish':'Next')+'</button></div>'}
 
