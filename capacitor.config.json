@@ -1,0 +1,9 @@
+{
+  "appId": "com.jambprep.app",
+  "appName": "JAMB PREP APP",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false
+  }
+}
