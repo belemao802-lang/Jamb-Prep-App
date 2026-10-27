@@ -90,6 +90,7 @@ h1{font-size:22px}h2{font-size:17px}.muted{color:var(--muted);font-size:13px}.ti
 <nav class="tabs" id="tabs"></nav></div>
 <div id="over"></div>
 
+<script src="./content/jamb-catalog.js"></script>
 <script>
 var ICON={
 home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
@@ -232,6 +233,13 @@ var SUBJ={
  {q:'What is the study of how people use scarce resources to meet unlimited wants called?',o:['Economics','Sociology','Politics','Geography'],a:0},
  {q:'When the price of a good rises, quantity demanded usually does what?',o:['Rises','Falls','Stays the same','Doubles'],a:1},
  {q:'Which of these is a factor of production?',o:['Land','Inflation','Tax','Budget'],a:0}]}};
+if(window.JAMB_LIBRARY){
+ Object.keys(JAMB_LIBRARY).forEach(function(k){SUBJ[k]=JAMB_LIBRARY[k]});
+ STREAMS.Science.s=['Use of English'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Science & General'||JAMB_LIBRARY[k].s==='Technical & Vocational'}));
+ STREAMS.Arts.s=['Use of English'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Arts & Humanities'||JAMB_LIBRARY[k].s==='Languages'}));
+ STREAMS.Commercial.s=['Use of English','Mathematics'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Commercial & Social Sciences'}));
+ if(!SUBJ[sub])sub='Use of English';
+}
 var Q=[],qi=0,picked=null,score=0;
 var STEPS=[
  ['Hi, I’m your AI guide','Let me show you around Jamb Prep App in under a minute.'],
@@ -257,13 +265,14 @@ home:function(){return '<div class="row"><div class="av">'+ini()+'</div><div sty
  '<div class="card"><div class="between"><b>Today’s Goal</b><span class="muted">'+gn()+'/3 sessions</span></div><div class="bar" style="margin-top:10px"><i style="width:'+Math.min(100,gn()/3*100)+'%"></i></div></div>'},
 
 subjects:function(){
- var d=SUBJ[sub],T=d.t,L=STREAMS[stream].s;
- return '<div class="chips">'+L.map(function(k){return '<button class="chip2'+(k===sub?' on':'')+'" onclick="setSub(\''+k+'\')">'+k+'</button>'}).join('')+'</div>'+
+ var d=SUBJ[sub],T=d.t,L=Object.keys(SUBJ);
+ return '<div class="chips">'+L.map(function(k){return '<button class="chip2'+(k===sub?' on':'')+'" onclick="setSub(\''+k.replace(/'/g,"\\'")+'\')">'+esc(k)+'</button>'}).join('')+'</div>'+
  '<div class="between"><div class="row">'+box(d.i,'#4F6BFF',26,'margin:0;width:52px;height:52px')+'<div><h1>'+sub+'</h1><div class="muted">'+d.s+'</div></div></div><button class="lnk" onclick="streams()">Change stream</button></div>'+
  '<div class="row"><div class="bar" style="flex:1;height:8px"><i style="width:'+pp(sub)+'%"></i></div><b>'+pp(sub)+'%</b></div>'+
- '<div class="res"><button>'+box('file','#4F6BFF')+'Study Notes</button><button>'+box('video','#EC4899')+'Video Lessons</button><button onclick="startQuiz()">'+box('pencil','#14B8A6')+'Practice Questions</button><button onclick="startQuiz()">'+box('clock','#F97316')+'Past Questions</button></div>'+
- '<div class="between"><h2>Recent Topics</h2><span style="color:var(--pri);font-weight:600;font-size:14px">View All</span></div>'+
- T.map(function(x){return '<div class="card topic">'+box(x[3],'#4F6BFF',18)+'<div style="flex:1"><b>'+x[0]+'</b><span class="tiny">0/'+x[2]+' lessons completed</span></div><span style="color:var(--muted)">'+I('chev',18)+'</span></div>'}).join('')},
+ '<div class="res"><button onclick="openTopic(\''+sub.replace(/'/g,"\\'")+'\',\''+(T[0]?T[0][0]:'Overview').replace(/'/g,"\\'")+'\')">'+box('file','#4F6BFF')+'Study Notes</button><button onclick="openVideoNotice()">'+box('video','#EC4899')+'Video Lessons</button><button onclick="startSubjectQuiz(\''+sub.replace(/'/g,"\\'")+'\')">'+box('pencil','#14B8A6')+'Practice Questions</button><button onclick="openPastQuestionNotice(\''+sub.replace(/'/g,"\\'")+'\')">'+box('clock','#F97316')+'Past Questions</button></div>'+
+ '<div class="between"><h2>Syllabus Topics</h2><span class="tiny">'+T.length+' topics</span></div>'+
+ '<p class="muted">Open any topic for study guidance and revision prompts. These are syllabus-aligned starter notes and should be checked against the latest official JAMB syllabus.</p>'+
+ T.map(function(x){return '<button class="card topic" style="width:100%;text-align:left" onclick="openTopic(\''+sub.replace(/'/g,"\\'")+'\',\''+x[0].replace(/'/g,"\\'")+'\')">'+box(x[3],'#4F6BFF',18)+'<div style="flex:1"><b>'+esc(x[0])+'</b><span class="tiny">Study notes · revision checklist</span></div><span style="color:var(--muted)">'+I('chev',18)+'</span></button>'}).join('')},
 
 ai:function(){return '<div class="row" style="padding-bottom:12px;border-bottom:1px solid var(--bd)"><div class="av ai">AI</div><div><b>Jamb Prep AI Tutor</b><div class="tiny">Ask me anything about JAMB.</div></div></div>'+
  '<div class="chat" id="chat"><div class="b bot">Hi Champion! Ask me anything about your JAMB subjects.</div></div>'+
@@ -305,6 +314,19 @@ function send(){
 function closeOv(){document.getElementById('over').innerHTML='';render()}
 function endTour(){first=false;try{localStorage.setItem('jp_tour','1')}catch(e){}closeOv()}
 
+function startSubjectQuiz(k){sub=k;Q=(SUBJ[k]&&SUBJ[k].q||[]).slice();qi=0;picked=null;score=0;if(!Q.length){openTopic(k,SUBJ[k].t[0][0]);return}quiz()}
+function openTopic(k,name){
+ var s=SUBJ[k],topic=s&&s.topics?s.topics.find(function(t){return t.name===name}):null;
+ if(!topic){document.getElementById('over').innerHTML='<div class="ov light"><h2>'+esc(name)+'</h2><p>Topic notes are being prepared.</p><button class="btn" onclick="closeOv()">Close</button></div>';return}
+ var html='<div class="between"><div><div class="tiny">'+esc(k)+'</div><h1>'+esc(topic.name)+'</h1></div><button class="lnk" onclick="closeOv()">Close</button></div>'+
+ '<div class="card"><h2>Study notes</h2><p>'+esc(topic.note)+'</p><p class="muted">This is a starter revision guide, not a substitute for the full official syllabus, prescribed texts, diagrams or teacher instruction.</p></div>'+
+ '<div class="card"><h2>Quick revision checklist</h2><ul>'+topic.revision.map(function(x){return '<li style="margin:8px 0">'+esc(x)+'</li>'}).join('')+'</ul></div>'+
+ '<div class="card"><h2>Check your understanding</h2><p class="muted">Use these prompts for active recall before checking your textbook or class notes.</p><ol>'+topic.revision.map(function(x){return '<li style="margin:8px 0">Can you explain this in your own words? '+esc(x)+'</li>'}).join('')+'</ol><button class="btn" onclick="startSubjectQuiz(\''+k.replace(/'/g,"\\'")+'\')">Practise '+esc(k)+'</button></div>'+
+ '<div class="card"><h2>Past questions</h2><p>Verified official past questions for this topic have not yet been imported. The current bank contains newly written practice questions, not claimed past questions.</p><button class="lnk" onclick="openPastQuestionNotice(\''+k.replace(/'/g,"\\'")+'\')">Past-question source status</button></div>';
+ document.getElementById('over').innerHTML='<div class="ov light">'+html+'</div>';
+}
+function openPastQuestionNotice(k){document.getElementById('over').innerHTML='<div class="ov light"><div class="between"><h1>Past-question archive</h1><button class="lnk" onclick="closeOv()">Close</button></div><div class="card"><h2>'+esc(k)+'</h2><p>The app should only label a question as an official JAMB past question when its year and source are verified and its reuse is permitted. That verified archive has not yet been added, so this app will not invent past-question years or mislabel practice questions.</p><p>Meanwhile, use the clearly labelled newly written JAMB-style practice bank.</p></div></div>'}
+function openVideoNotice(){document.getElementById('over').innerHTML='<div class="ov light"><h1>Video lessons</h1><p>Video lessons have not been bundled yet. The offline study notes and practice questions remain available. Future lessons should be downloadable or bundled so they do not block offline study.</p><button class="btn" onclick="closeOv()">Close</button></div>'}
 function startQuiz(){Q=SUBJ[sub].q;qi=0;picked=null;score=0;quiz()}
 function startChallenge(){var all=STREAMS[stream].s.map(function(k){return SUBJ[k]&&SUBJ[k].q.length?{subject:k,item:SUBJ[k].q[Math.floor(Math.random()*SUBJ[k].q.length)]}:null}).filter(Boolean).slice(0,5);Q=all.map(function(x){return Object.assign({},x.item,{_subject:x.subject})});sub='Daily Challenge';qi=0;picked=null;score=0;quiz()}
 function toggleBookmark(){var x=Q[qi],subject=x._subject||sub,key=subject+'|'+x.q,at=BOOKMARKS.findIndex(function(b){return b.key===key});if(at>=0)BOOKMARKS.splice(at,1);else BOOKMARKS.push({key:key,subject:subject,q:x.q,o:x.o,a:x.a});save();quiz()}
