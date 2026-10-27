@@ -6,7 +6,7 @@ An offline-first JAMB revision app. After installation, learners must be able to
 ## High-value features
 - [x] Local revision notebook: bookmark questions and automatically collect missed questions on this device.
 - [x] Five-question daily challenge from the current stream's available sample bank.
-- [ ] Full JAMB subject catalogue and syllabus topic map, with completion checklists.
+- [x] Broad starter catalogue: 35 subject entries and 645 topic headings, with topic cards and starter revision guides. (Exact official coverage still needs verification.)
 - [ ] Topic study pages with accurate notes, definitions, worked examples, diagrams, summaries, and self-tests.
 - [ ] Search and filters by subject, topic, difficulty, question type, and year/source.
 - [ ] Topic practice, mixed practice, timed CBT, custom-length quizzes, and retry-incorrect mode.
@@ -30,4 +30,4 @@ An offline-first JAMB revision app. After installation, learners must be able to
 6. Test cold launch and every study flow with both Wi-Fi and mobile data disabled, then test authentication, sync, and AI online.
 
 ## Known gaps to close
-The current front-end loads Supabase from a CDN, has only a small sample of subjects/topics/questions, contains an AI Tutor placeholder rather than a real answer service, and has notes/video/topic controls that still need functional destinations. The daily challenge uses only currently available sample questions and is not a full JAMB mock exam.
+The app now has a broad 35-subject/645-topic starter catalogue and 98 original practice questions, but the topic notes are revision outlines rather than full textbook-quality notes. It still loads Supabase from a CDN, has no verified official past-question archive, and the AI Tutor remains a placeholder rather than a real answer service. Video lessons are not bundled. The daily challenge uses the currently available sample questions and is not a full JAMB mock exam. Exact syllabus coverage and current JAMB subject availability still need official verification.
