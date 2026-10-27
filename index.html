@@ -235,6 +235,7 @@ var SUBJ={
  {q:'Which of these is a factor of production?',o:['Land','Inflation','Tax','Budget'],a:0}]}};
 if(window.JAMB_LIBRARY){
  Object.keys(JAMB_LIBRARY).forEach(function(k){SUBJ[k]=JAMB_LIBRARY[k]});
+ delete SUBJ.Literature; // Use the full JAMB subject label from the catalogue.
  STREAMS.Science.s=['Use of English'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Science & General'||JAMB_LIBRARY[k].s==='Technical & Vocational'}));
  STREAMS.Arts.s=['Use of English'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Arts & Humanities'||JAMB_LIBRARY[k].s==='Languages'}));
  STREAMS.Commercial.s=['Use of English','Mathematics'].concat(Object.keys(JAMB_LIBRARY).filter(function(k){return JAMB_LIBRARY[k].s==='Commercial & Social Sciences'}));
