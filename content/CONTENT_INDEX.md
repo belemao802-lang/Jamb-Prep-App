@@ -12,6 +12,14 @@ This folder contains separate Markdown files so lessons and questions can be cop
 - [Topic-by-topic lessons](lessons/mathematics.md)
 - [Multiple-choice practice bank](question-banks/mathematics-mcq.md)
 
+### Biology
+- [Topic-by-topic lessons](lessons/biology.md)
+- [Multiple-choice practice bank](question-banks/biology-mcq.md)
+
+### Chemistry
+- [Topic-by-topic lessons](lessons/chemistry.md)
+- [Multiple-choice practice bank](question-banks/chemistry-mcq.md)
+
 ## Audit and status
 - [Code and curriculum audit](../docs/CODE_AND_CURRICULUM_AUDIT.md)
 - [Curriculum content status](../docs/CURRICULUM_CONTENT_STATUS.md)
