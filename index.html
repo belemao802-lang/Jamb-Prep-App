@@ -91,6 +91,7 @@ h1{font-size:22px}h2{font-size:17px}.muted{color:var(--muted);font-size:13px}.ti
 <div id="over"></div>
 
 <script src="./content/jamb-catalog.js"></script>
+<script src="./content/interactive-content.js"></script>
 <script>
 var ICON={
 home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
@@ -317,20 +318,43 @@ function send(){
 function closeOv(){document.getElementById('over').innerHTML='';render()}
 function endTour(){first=false;try{localStorage.setItem('jp_tour','1')}catch(e){}closeOv()}
 
-function startSubjectQuiz(k){sub=k;Q=(SUBJ[k]&&SUBJ[k].q||[]).slice();qi=0;picked=null;score=0;if(!Q.length){openTopic(k,SUBJ[k].t[0][0]);return}quiz()}
+function startSubjectQuiz(k){
+ sub=k;
+ var pack=window.JAMB_CONTENT_PACKS&&window.JAMB_CONTENT_PACKS[k];
+ Q=(pack&&pack.questions&&pack.questions.length?pack.questions:(SUBJ[k]&&SUBJ[k].q||[])).map(function(x){return Object.assign({},x)});
+ qi=0;picked=null;score=0;
+ if(!Q.length){var first=SUBJ[k]&&SUBJ[k].t&&SUBJ[k].t[0];openTopic(k,first?(first[0]||first.name):'Overview');return}
+ quiz()
+}
 function openTopic(k,name){
- var s=SUBJ[k],topic=s&&s.topics?s.topics.find(function(t){return t.name===name}):null;
- if(!topic){document.getElementById('over').innerHTML='<div class="ov light"><h2>'+esc(name)+'</h2><p>Topic notes are being prepared.</p><button class="btn" onclick="closeOv()">Close</button></div>';return}
- var html='<div class="between"><div><div class="tiny">'+esc(k)+'</div><h1>'+esc(topic.name)+'</h1></div><button class="lnk" onclick="closeOv()">Close</button></div>'+
- '<div class="card"><h2>Study notes</h2><p>'+esc(topic.note)+'</p><p class="muted">This is a starter revision guide, not a substitute for the full official syllabus, prescribed texts, diagrams or teacher instruction.</p></div>'+
- '<div class="card"><h2>Quick revision checklist</h2><ul>'+topic.revision.map(function(x){return '<li style="margin:8px 0">'+esc(x)+'</li>'}).join('')+'</ul></div>'+
- '<div class="card"><h2>Check your understanding</h2><p class="muted">Use these prompts for active recall before checking your textbook or class notes.</p><ol>'+topic.revision.map(function(x){return '<li style="margin:8px 0">Can you explain this in your own words? '+esc(x)+'</li>'}).join('')+'</ol><button class="btn" onclick="startSubjectQuiz(\''+k.replace(/'/g,"\\'")+'\')">Practise '+esc(k)+'</button></div>'+
- '<div class="card"><h2>Past questions</h2><p>Verified official past questions for this topic have not yet been imported. The current bank contains newly written practice questions, not claimed past questions.</p><button class="lnk" onclick="openPastQuestionNotice(\''+k.replace(/'/g,"\\'")+'\')">Past-question source status</button></div>';
+ var s=SUBJ[k],pack=window.JAMB_CONTENT_PACKS&&window.JAMB_CONTENT_PACKS[k],topics=s&&s.t?s.t:[];
+ var topic=null,topicIndex=-1;
+ for(var i=0;i<topics.length;i++){var nm=typeof topics[i]==='string'?topics[i]:(topics[i].name||topics[i][0]);if(nm===name){topic=topics[i];topicIndex=i;break}}
+ var lesson=null,lessons=pack&&pack.lessons||[];
+ function norm(v){return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+ lesson=lessons.find(function(x){return norm(x.title)===norm(name)});
+ if(!lesson&&lessons.length&&topicIndex>=0)lesson=lessons[Math.min(topicIndex,lessons.length-1)];
+ if(!lesson&&lessons.length)lesson=lessons.find(function(x){return norm(name).includes(norm(x.title))||norm(x.title).includes(norm(name))});
+ var note=lesson&&lesson.note?lesson.note:(topic&&topic.note?topic.note:'Detailed notes for this topic are being expanded. Use the key ideas and revision checklist below, and compare with your current JAMB syllabus.');
+ var revision=(lesson&&lesson.revision&&lesson.revision.length?lesson.revision:(topic&&topic.revision?topic.revision:[]));
+ if(!revision.length)revision=['Define the main terms used in this topic.','Explain the main principle and give an example.','Practise a question without looking at your notes.'];
+ var questions=(pack&&pack.questions||[]).filter(function(q){return norm(q.topic)===norm(name)});
+ if(!questions.length&&pack&&pack.questions&&pack.questions.length){
+  var firstWord=norm(name).split(' ')[0];
+  questions=pack.questions.filter(function(q){return norm(q.q).includes(firstWord)});
+ }
+ var safeK=k.replace(/'/g,"\\'"),safeName=name.replace(/'/g,"\\'");
+ var html='<div class="between"><div><div class="tiny">'+esc(k)+'</div><h1>'+esc(name)+'</h1></div><button class="lnk" onclick="closeOv()">Close</button></div>'+
+ '<div class="card"><h2>Topic lesson</h2><p style="line-height:1.7;white-space:normal">'+esc(note)+'</p><p class="muted" style="margin-top:12px">Original study notes. Check topic wording and coverage against the current official JAMB syllabus.</p></div>'+
+ '<div class="card"><h2>Quick revision checklist</h2><ul>'+revision.map(function(x){return '<li style="margin:8px 0">'+esc(x)+'</li>'}).join('')+'</ul></div>'+
+ '<div class="card"><h2>Check your understanding</h2><p class="muted">Try explaining these points aloud or in your own words.</p><ol>'+revision.map(function(x){return '<li style="margin:8px 0">Can you explain this? '+esc(x)+'</li>'}).join('')+'</ol><button class="btn" onclick="startSubjectQuiz(\''+safeK+'\')">Practise '+esc(k)+' ('+(pack&&pack.questions?pack.questions.length:(s.q||[]).length)+' questions)</button></div>'+
+ '<div class="card"><h2>Question bank</h2><p>'+((pack&&pack.questions&&pack.questions.length)?(pack.questions.length+' original practice questions are available for this subject. Choose Practice Questions to answer them, see marking and explanations, and track your score.'):'The detailed question bank for this subject is being expanded.')+'</p><button class="btn" onclick="startSubjectQuiz(\''+safeK+'\')">Start topic practice</button></div>'+
+ '<div class="card"><h2>Past questions</h2><p>Verified official past questions have not yet been imported. These are newly written practice questions, not claimed official past questions.</p><button class="lnk" onclick="openPastQuestionNotice(\''+safeK+'\')">Past-question source status</button></div>';
  document.getElementById('over').innerHTML='<div class="ov light">'+html+'</div>';
 }
 function openPastQuestionNotice(k){document.getElementById('over').innerHTML='<div class="ov light"><div class="between"><h1>Past-question archive</h1><button class="lnk" onclick="closeOv()">Close</button></div><div class="card"><h2>'+esc(k)+'</h2><p>The app should only label a question as an official JAMB past question when its year and source are verified and its reuse is permitted. That verified archive has not yet been added, so this app will not invent past-question years or mislabel practice questions.</p><p>Meanwhile, use the clearly labelled newly written JAMB-style practice bank.</p></div></div>'}
 function openVideoNotice(){document.getElementById('over').innerHTML='<div class="ov light"><h1>Video lessons</h1><p>Video lessons have not been bundled yet. The offline study notes and practice questions remain available. Future lessons should be downloadable or bundled so they do not block offline study.</p><button class="btn" onclick="closeOv()">Close</button></div>'}
-function startQuiz(){Q=SUBJ[sub].q;qi=0;picked=null;score=0;quiz()}
+function startQuiz(){startSubjectQuiz(sub)}
 function startChallenge(){var all=STREAMS[stream].s.map(function(k){return SUBJ[k]&&SUBJ[k].q.length?{subject:k,item:SUBJ[k].q[Math.floor(Math.random()*SUBJ[k].q.length)]}:null}).filter(Boolean).slice(0,5);Q=all.map(function(x){return Object.assign({},x.item,{_subject:x.subject})});sub='Daily Challenge';qi=0;picked=null;score=0;quiz()}
 function toggleBookmark(){var x=Q[qi],subject=x._subject||sub,key=subject+'|'+x.q,at=BOOKMARKS.findIndex(function(b){return b.key===key});if(at>=0)BOOKMARKS.splice(at,1);else BOOKMARKS.push({key:key,subject:subject,q:x.q,o:x.o,a:x.a});save();quiz()}
 function openNotebook(){var rows='<div class="between"><h1>Revision Notebook</h1><button class="lnk" onclick="closeOv()">Close</button></div><p class="muted">Saved questions and questions to revisit are stored on this device.</p><h2>Bookmarked questions ('+BOOKMARKS.length+')</h2>';
@@ -348,7 +372,7 @@ function quiz(){
  var x=Q[qi];
  o.innerHTML='<div class="ov quiz"><div class="row"><button onclick="closeOv()" aria-label="Close" style="background:none;border:0;color:#fff">'+I('x',22)+'</button><b style="flex:1">'+(Q[qi]._subject||sub)+'</b><button onclick="toggleBookmark()" aria-label="Bookmark question" style="background:none;border:0;color:'+(BOOKMARKS.some(function(b){return b.key===((Q[qi]._subject||sub)+'|'+Q[qi].q)})?'#FBBF24':'#fff')+';font-size:20px">★</button><span style="color:#C9D2FF">'+(qi+1)+'/'+Q.length+'</span></div>'+
  '<div style="height:5px;border-radius:3px;background:#1E2A5E"><div style="height:5px;border-radius:3px;background:#38BDF8;width:'+((qi+1)/Q.length*100)+'%"></div></div>'+
- '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p>'+(picked===null?'':'<p style="margin-top:12px;color:'+(picked===x.a?'#86EFAC':'#FCA5A5')+';font-size:13px;font-weight:600">'+(picked===x.a?'Correct!':'Not quite. Correct answer: '+esc(x.o[x.a]))+'</p>')+'</div>'+
+ '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p>'+(picked===null?'':'<p style="margin-top:12px;color:'+(picked===x.a?'#86EFAC':'#FCA5A5')+';font-size:13px;font-weight:600">'+(picked===x.a?'Correct!':'Not quite. Correct answer: '+esc(x.o[x.a]))+'</p>'+(x.explanation?'<p style="margin-top:10px;color:#DCE4FF;font-size:14px;line-height:1.5"><b>Explanation:</b> '+esc(x.explanation)+'</p>':''))+'</div>'+
  x.o.map(function(t,n){var cl=picked===null?'':(n===x.a?' ok':(picked===n?' no':''));return '<button class="opt'+cl+'" onclick="pick('+n+')"><i>'+'ABCD'[n]+'</i><span style="flex:1">'+t+'</span>'+(cl===' ok'?I('check',22,'#22C55E'):cl===' no'?I('xc',22,'#EF4444'):'')+'</button>'}).join('')+
  '<div style="flex:1"></div><button class="btn" style="padding:16px;font-size:16px;opacity:'+(picked===null?.5:1)+'" '+(picked===null?'disabled':'')+' onclick="nextQ()">'+(qi===Q.length-1?'Finish':'Next')+'</button></div>'}
 
