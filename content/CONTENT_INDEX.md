@@ -36,6 +36,9 @@ This folder contains separate Markdown files so lessons and questions can be cop
 - [Topic-by-topic lessons](lessons/technical-drawing.md)
 - [Multiple-choice practice bank](question-banks/technical-drawing-mcq.md)
 
+## Remaining subject packs
+- [Hausa, Igbo, Yoruba, Arabic, French, Music, Fine Arts, Home Economics, Physical and Health Education, Electronics, Metalwork and Woodwork](REMAINING-SUBJECT-PACKS.md)
+
 ## Additional subject packs
 - [Computer Studies, Insurance, Office Practice, Store Management, Building Construction and Electrical Installation](ADDITIONAL-SUBJECT-PACKS.md)
 
