@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jamb Prep App</title>
-<meta name="theme-color" content="#0B1230">
+<meta name="theme-color" content="#061C19">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
-:root{--bg:#F5F7FF;--card:#fff;--text:#141A3A;--muted:#7B83A6;--pri:#4F6BFF;--bd:#E3E8FF;--navy:#0B1230;--navy2:#1B2A7A;--ok:#22C55E;--bad:#EF4444;--bub:#DCE4FF;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1230;--card:#141C4A;--text:#EEF1FF;--muted:#9AA3D0;--bd:#2A3670;--bub:#27358A;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0B1230;--card:#141C4A;--text:#EEF1FF;--muted:#9AA3D0;--bd:#2A3670;--bub:#27358A;color-scheme:dark}
+:root{--bg:#F4F8F6;--card:#FFFFFF;--text:#12231E;--muted:#65776F;--pri:#008C63;--bd:#DCE8E2;--navy:#061C19;--navy2:#0B4032;--ok:#13B981;--bad:#DC4545;--bub:#D9F7E9;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#061C19;--card:#0B2923;--text:#ECF8F2;--muted:#A0B9AE;--bd:#21483B;--bub:#123D30;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#061C19;--card:#0B2923;--text:#ECF8F2;--muted:#A0B9AE;--bd:#21483B;--bub:#123D30;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%}
@@ -136,7 +136,7 @@ briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 
 globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20"/>'
 };
 function I(n,s,c){return '<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>'}
-function LOGO(s){return '<svg viewBox="0 0 100 110" width="'+s+'" height="'+Math.round(s*1.1)+'" aria-hidden="true"><defs><linearGradient id="lj" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9A8FF"/></linearGradient><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B8CFF"/><stop offset="1" stop-color="#3B4FD8"/></linearGradient></defs><path d="M60 40V78a20 20 0 0 1-20 20 20 20 0 0 1-17-9" fill="none" stroke="url(#lj)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 38v14c0 7 10 11 22 11s22-4 22-11V38L50 48z" fill="#2B3FB8"/><path d="M50 8L92 26 50 44 8 26z" fill="url(#lc)"/><path d="M86 28v22" stroke="#F5B93A" stroke-width="3" stroke-linecap="round"/><circle cx="86" cy="54" r="4.5" fill="#F5B93A"/></svg>'}
+function LOGO(s){return '<svg viewBox="0 0 100 100" width="'+s+'" height="'+s+'" aria-hidden="true"><defs><linearGradient id="lj" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D7F8E8"/></linearGradient><linearGradient id="lc" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#36F0A2"/><stop offset="1" stop-color="#008C63"/></linearGradient></defs><path d="M8 48Q25 40 49 52V88Q27 78 8 87Z" fill="url(#lj)"/><path d="M92 48Q75 40 51 52V88Q73 78 92 87Z" fill="url(#lj)"/><path d="M21 64L39 76L76 39" fill="none" stroke="url(#lc)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 4L96 22L50 40L4 22Z" fill="url(#lc)"/><path d="M22 31V43Q50 60 78 43V31L50 42Z" fill="#07996B"/><path d="M89 24V41" stroke="#F6C65B" stroke-width="2.5" stroke-linecap="round"/><circle cx="89" cy="45" r="3.5" fill="#F6C65B"/></svg>'}
 function A(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')'}
 function box(ico,c,sz,x){return '<div class="ic" style="color:'+c+';background:'+A(c,.16)+';'+(x||'')+'">'+I(ico,sz||22)+'</div>'}
 
