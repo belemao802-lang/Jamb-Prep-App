@@ -99,7 +99,7 @@ A. 7 m/s  B. 12 m/s  C. 16 m/s  D. 24 m/s
 5. **A** — Add real parts and imaginary parts: 4−3i.  
 6. **B** — (2i)²=4i²=−4.  
 7. **B** — The base case starts the induction proof.  
-8. **C** — (x+2)³ includes 3x(2²)=12x; therefore the correct coefficient is 12, option D.  
+8. **D** — Expanding (x+2)³ gives x³+6x²+12x+8, so the coefficient of x is 12.  
 9. **B** — 3!=6 arrangements.  
 10. **B** — 5C2=5!/(2!3!)=10.  
 11. **B** — Determinant=2×4−1×3=5.  
