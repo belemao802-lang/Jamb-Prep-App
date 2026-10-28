@@ -28,6 +28,14 @@ This folder contains separate Markdown files so lessons and questions can be cop
 - [Topic-by-topic lessons](lessons/agricultural-science.md)
 - [Multiple-choice practice bank](question-banks/agricultural-science-mcq.md)
 
+### Further Mathematics
+- [Topic-by-topic lessons](lessons/further-mathematics.md)
+- [Multiple-choice practice bank](question-banks/further-mathematics-mcq.md)
+
+### Technical Drawing
+- [Topic-by-topic lessons](lessons/technical-drawing.md)
+- [Multiple-choice practice bank](question-banks/technical-drawing-mcq.md)
+
 ## Audit and status
 - [Code and curriculum audit](../docs/CODE_AND_CURRICULUM_AUDIT.md)
 - [Curriculum content status](../docs/CURRICULUM_CONTENT_STATUS.md)
