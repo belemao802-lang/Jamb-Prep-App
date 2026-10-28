@@ -191,7 +191,7 @@ function sd(k){return ST.subj[k]||(ST.subj[k]={a:0,c:0,best:0})}
 function nm(){return P?P.name.split(' ')[0]:'Champion'}
 function ini(){return P?P.name.charAt(0).toUpperCase():'?'}
 function gn(){return ST.goalDay===today()?ST.goalN:0}
-function pp(k){var s=ST.subj[k];return s?Math.round(s.best/SUBJ[k].q.length*100):0}
+function pp(k){var s=ST.subj[k],pack=window.JAMB_CONTENT_PACKS&&window.JAMB_CONTENT_PACKS[k],n=pack&&pack.questions?pack.questions.length:(SUBJ[k]&&SUBJ[k].q?SUBJ[k].q.length:0);return s&&n?Math.min(100,Math.round(s.best/n*100)):0}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 var TABS=[['home','home','Home'],['subjects','book','Subjects'],['ai','sparkles','AI Tutor'],['profile','user','Profile']];
 var STREAMS={
@@ -368,12 +368,12 @@ function finish(){var s=sd(sub);if(score>s.best)s.best=score;ST.sessions++;var t
 function nextQ(){picked=null;qi++;if(qi>=Q.length)finish();quiz()}
 function quiz(){
  var o=document.getElementById('over');
- if(qi>=Q.length){o.innerHTML='<div class="ov quiz" style="align-items:center;justify-content:center"><div style="font-size:56px;font-weight:800">'+score+'/'+Q.length+'</div><div style="color:#C9D2FF">Nice work, Champion!</div><button class="btn" style="margin-top:24px" onclick="closeOv()">Back to Home</button></div>';return}
+ if(qi>=Q.length){o.innerHTML='<div class="ov quiz" style="align-items:center;justify-content:center"><div style="font-size:56px;font-weight:800">'+score+'/'+Q.length+'</div><div style="color:#C9D2FF">'+Math.round(score/Q.length*100)+'% correct</div><div class="qc" style="width:100%;max-width:420px;margin-top:16px"><b>Session summary</b><p style="margin-top:8px">Correct: '+score+'</p><p style="margin-top:4px">Incorrect: '+(Q.length-score)+'</p><p style="margin-top:4px">Total questions attempted across all sessions: '+ST.total+'</p></div><div style="color:#C9D2FF">Nice work, Champion!</div><button class="btn" style="margin-top:24px" onclick="closeOv()">Back to Home</button></div>';return}
  var x=Q[qi];
  o.innerHTML='<div class="ov quiz"><div class="row"><button onclick="closeOv()" aria-label="Close" style="background:none;border:0;color:#fff">'+I('x',22)+'</button><b style="flex:1">'+(Q[qi]._subject||sub)+'</b><button onclick="toggleBookmark()" aria-label="Bookmark question" style="background:none;border:0;color:'+(BOOKMARKS.some(function(b){return b.key===((Q[qi]._subject||sub)+'|'+Q[qi].q)})?'#FBBF24':'#fff')+';font-size:20px">★</button><span style="color:#C9D2FF">'+(qi+1)+'/'+Q.length+'</span></div>'+
  '<div style="height:5px;border-radius:3px;background:#1E2A5E"><div style="height:5px;border-radius:3px;background:#38BDF8;width:'+((qi+1)/Q.length*100)+'%"></div></div>'+
- '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+x.q+'</p>'+(picked===null?'':'<p style="margin-top:12px;color:'+(picked===x.a?'#86EFAC':'#FCA5A5')+';font-size:13px;font-weight:600">'+(picked===x.a?'Correct!':'Not quite. Correct answer: '+esc(x.o[x.a]))+'</p>'+(x.explanation?'<p style="margin-top:10px;color:#DCE4FF;font-size:14px;line-height:1.5"><b>Explanation:</b> '+esc(x.explanation)+'</p>':''))+'</div>'+
- x.o.map(function(t,n){var cl=picked===null?'':(n===x.a?' ok':(picked===n?' no':''));return '<button class="opt'+cl+'" onclick="pick('+n+')"><i>'+'ABCD'[n]+'</i><span style="flex:1">'+t+'</span>'+(cl===' ok'?I('check',22,'#22C55E'):cl===' no'?I('xc',22,'#EF4444'):'')+'</button>'}).join('')+
+ '<div class="qc"><span class="chip">Multiple Choice</span><p style="font-size:18px;font-weight:700;line-height:1.4;margin-top:12px">'+esc(x.q)+'</p>'+(picked===null?'':'<p style="margin-top:12px;color:'+(picked===x.a?'#86EFAC':'#FCA5A5')+';font-size:13px;font-weight:600">'+(picked===x.a?'Correct!':'Not quite. Correct answer: '+esc(x.o[x.a]))+'</p>'+(x.explanation?'<p style="margin-top:10px;color:#DCE4FF;font-size:14px;line-height:1.5"><b>Explanation:</b> '+esc(x.explanation)+'</p>':''))+'</div>'+
+ x.o.map(function(t,n){var cl=picked===null?'':(n===x.a?' ok':(picked===n?' no':''));return '<button class="opt'+cl+'" onclick="pick('+n+')"><i>'+'ABCD'[n]+'</i><span style="flex:1">'+esc(t)+'</span>'+(cl===' ok'?I('check',22,'#22C55E'):cl===' no'?I('xc',22,'#EF4444'):'')+'</button>'}).join('')+
  '<div style="flex:1"></div><button class="btn" style="padding:16px;font-size:16px;opacity:'+(picked===null?.5:1)+'" '+(picked===null?'disabled':'')+' onclick="nextQ()">'+(qi===Q.length-1?'Finish':'Next')+'</button></div>'}
 
 function tour(){
