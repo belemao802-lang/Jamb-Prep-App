@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">JAMB Prep App logo</title><desc id="desc">An emerald graduation cap above an open book with a rising check mark.</desc>
+<defs><linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#36F0A2"/><stop offset="1" stop-color="#008C63"/></linearGradient><linearGradient id="page" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D7F8E8"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="#061C19"/>
+<path d="M76 237Q160 198 252 248V397Q164 354 76 392Z" fill="url(#page)"/>
+<path d="M436 237Q352 198 260 248V397Q348 354 436 392Z" fill="url(#page)"/>
+<path d="M105 264Q166 246 226 279V363Q166 337 105 363Z" fill="#0B4032" opacity=".12"/>
+<path d="M407 264Q346 246 286 279V363Q346 337 407 363Z" fill="#0B4032" opacity=".12"/>
+<path d="M125 316L205 365L382 171" fill="none" stroke="url(#emerald)" stroke-width="33" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M256 55L453 128L256 204L59 128Z" fill="url(#emerald)"/>
+<path d="M137 157V218Q256 286 375 218V157L256 203Z" fill="#07996B"/>
+<path d="M437 136V209" stroke="#F6C65B" stroke-width="12" stroke-linecap="round"/><circle cx="437" cy="227" r="17" fill="#F6C65B"/>
+<path d="M76 237Q164 204 252 248Q344 204 436 237" fill="none" stroke="#0CB77B" stroke-width="10" stroke-linecap="round"/>
+</svg>
