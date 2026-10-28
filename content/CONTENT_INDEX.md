@@ -46,3 +46,48 @@ This folder contains separate Markdown files so lessons and questions can be cop
 - Each question bank currently includes its answers and short explanations at the end. For a test sheet, copy the questions first and retain the answer key separately.
 - These are initial packs, not complete coverage of every current JAMB syllabus objective. Topic headings must be compared against the current official syllabus before the content is labelled complete.
 - More subjects will be added as separate lesson and MCQ files, then reviewed for accuracy and coverage.
+
+
+### Government
+- [Topic-by-topic lessons](lessons/government.md)
+- [Multiple-choice practice bank](question-banks/government-mcq.md)
+
+
+### Economics
+- [Topic-by-topic lessons](lessons/economics.md)
+- [Multiple-choice practice bank](question-banks/economics-mcq.md)
+
+
+### Literature in English
+- [Topic-by-topic lessons](lessons/literature-in-english.md)
+- [Multiple-choice practice bank](question-banks/literature-in-english-mcq.md)
+
+
+### Geography
+- [Topic-by-topic lessons](lessons/geography.md)
+- [Multiple-choice practice bank](question-banks/geography-mcq.md)
+
+
+### Commerce
+- [Topic-by-topic lessons](lessons/commerce.md)
+- [Multiple-choice practice bank](question-banks/commerce-mcq.md)
+
+
+### Principles of Accounts
+- [Topic-by-topic lessons](lessons/principles-of-accounts.md)
+- [Multiple-choice practice bank](question-banks/principles-of-accounts-mcq.md)
+
+
+### History
+- [Topic-by-topic lessons](lessons/history.md)
+- [Multiple-choice practice bank](question-banks/history-mcq.md)
+
+
+### Christian Religious Studies
+- [Topic-by-topic lessons](lessons/christian-religious-studies.md)
+- [Multiple-choice practice bank](question-banks/christian-religious-studies-mcq.md)
+
+
+### Islamic Religious Studies
+- [Topic-by-topic lessons](lessons/islamic-religious-studies.md)
+- [Multiple-choice practice bank](question-banks/islamic-religious-studies-mcq.md)
