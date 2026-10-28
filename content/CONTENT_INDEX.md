@@ -36,6 +36,9 @@ This folder contains separate Markdown files so lessons and questions can be cop
 - [Topic-by-topic lessons](lessons/technical-drawing.md)
 - [Multiple-choice practice bank](question-banks/technical-drawing-mcq.md)
 
+## Additional subject packs
+- [Computer Studies, Insurance, Office Practice, Store Management, Building Construction and Electrical Installation](ADDITIONAL-SUBJECT-PACKS.md)
+
 ## Supplemental core-subject material
 - [Core-subject supplemental notes and practice](CORE-SUPPLEMENTAL.md)
 
